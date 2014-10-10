@@ -184,13 +184,13 @@ import xml.etree.ElementTree as etree
 import csv
 import sys, getopt
 
-def export_all_events(input_file, output_file):
-    export_selected_event(input_file, output_file, 'ALL')
+def export_all_events(input_file, output_file, start_year=None):
+    export_selected_event(input_file, output_file, 'ALL', start_year)
 
 """
 export using an event. Event is expected to be somthing like DOUGHT or FLOOD or ALL to export all events  
 """
-def export_selected_event(input_file, output_file, event):
+def export_selected_event(input_file, output_file, event, start_year=None):
     tree = etree.parse(input_file)
     root = tree.getroot()
     fichas = tree.find('fichas')
@@ -211,55 +211,93 @@ def export_selected_event(input_file, output_file, event):
         row_data = []
         #get event value
         event_value = tr.find('evento').text
-        if (event_value.strip().lower() == event.strip().lower() or event.upper() == 'ALL'):
+        year = int(tr.find('fechano').text)
+        if ((event_value.strip().lower() == event.strip().lower() or event.upper() == 'ALL') and (start_year == None or year >= int(start_year))):
             for tr_child in tr:
                 row_data.append(tr_child.text);
             writer.writerow([unicode(s).encode("utf-8") for s in row_data])
 
 """
-aggregate results using a level. event_list can be either unique name sucha as FLOOD or comma seperated FLOOD,DOUGHT.
-aggregation is done on the field affectados. For an event_list=FLOOD,DOUGHT, outpout file will have :
-level, affectados_FLOOD, affectados_DROUGHT
+aggregate results using a level. event can be either unique name sucha as FLOOD.
+aggregation is done on the field affectados. For an event=FLOOD, outpout file will have :
+level, affectados_FLOOD. 
 """
-def export_aggregate_events(input_file, output_file, event_list, aggregate_level):
-    print 'export_aggregate_events'
+def export_aggregate_events(input_file, output_file, event, aggregate_level, start_year=None):
+    print 'export_aggregate_events ' ,  start_year
+
+    levels = {}
+    
+    tree = etree.parse(input_file)
+    root = tree.getroot()
+    fichas = tree.find('fichas')
+
+    #get first child for header
+    tr_child = fichas.find('TR')
+    header = [aggregate_level, 'afectados_'+event]
+
+    csv_file = open(output_file, "wb") 
+    writer = csv.writer(csv_file, delimiter=',')
+    writer.writerow(header)
 
 
+    for tr in fichas:
+        #get event value
+        event_value = tr.find('evento').text
+        level_value = tr.find(aggregate_level).text #assume inout is valid : It should be level0 or level1 or level2
+        affected = tr.find('afectados').text
+        year = int(tr.find('fechano').text.strip())
+
+        if ((event_value.strip().lower() == event.strip().lower()) and (start_year == None or year >= int(start_year))):
+            if levels.has_key(level_value):
+                levels[level_value] = levels[level_value] + int(affected)
+            else:
+                levels[level_value] = int(affected)
+     
+    for key, value in levels.items():
+        writer.writerow([key, value])
+
+
+    
 def main(argv):
 
     try:
-        opts, args = getopt.getopt(argv,"i:e:o:a:")
+        opts, args = getopt.getopt(argv,"i:e:o:a:y:")
     except getopt.GetoptError:
-        print 'paser_invetar_xml.py -i <xlml_db>  -e <DROUGHT[,FLOOD,ALL]> -o <outputfile> [-a <levelid>]'
+        print 'paser_invetar_xml.py -i <xlml_db>  -e <DROUGHT[,FLOOD,ALL]> -o <outputfile> [-a <levelid>] [-y <start_year>]'
         sys.exit(2)
 
-    event_list = None
+    event = None
     input_file = None
     output_file = None
     aggregate_level = None
+    start_year = None
 
     for opt, arg in opts:
         if opt == '-e':
-            event_list = arg
+            event = arg
         elif  opt == '-o':
             output_file = arg
         elif  opt == '-i':
             input_file = arg
         elif opt == '-a':
             aggregate_level = arg
+        elif opt == '-a':
+            aggregate_level = arg
+        elif opt == '-y':
+            start_year = arg
+            
        
-    if (event_list == None or output_file == None or input_file == None):
+    if (event == None or output_file == None or input_file == None):
         print 'paser_invetar_xml.py -i <xlml_db> -e <DROUGHT[,FLOOD,ALL]> -o <outputfile> [-a <levelid>]'
         sys.exit(2)
     
-    if (event_list == 'ALL'):
-        export_all_events(input_file, output_file)
+    if (event == 'ALL'):
+        export_all_events(input_file, output_file, start_year)
     elif (aggregate_level == None):
-        export_selected_event(input_file, output_file, event_list)
+        export_selected_event(input_file, output_file, event, start_year)
     else:
-       export_aggregate_events(input_file, output_file, event_list, aggregate_level) 
+       export_aggregate_events(input_file, output_file, event, aggregate_level, start_year) 
     
-    print 'valid input'
 
 if __name__ == "__main__":
     main(sys.argv[1:])
@@ -267,6 +305,15 @@ if __name__ == "__main__":
 
 
 #python parse_inventar_xml.py -i DI_export_eth.xml -e ALL  -o all.csv
-#python parse_inventar_xml.py -i DI_export_eth.xml -e DROUGHT  -o drought.csv
-#python parse_inventar_xml.py -i DI_export_eth.xml -e FLOOD  -o flood.csv
 
+#python parse_inventar_xml.py -i DI_export_eth.xml -e DROUGHT  -o drought.csv
+#python parse_inventar_xml.py -i DI_export_eth.xml -e DROUGHT  -o drought_level0.csv -a level0
+#python parse_inventar_xml.py -i DI_export_eth.xml -e DROUGHT  -o drought_from_1990.csv -y 1990
+#python parse_inventar_xml.py -i DI_export_eth.xml -e DROUGHT  -o drought_level0_from_1990.csv -a level0 -y 1990
+ 
+
+#python parse_inventar_xml.py -i DI_export_eth.xml -e FLOOD  -o flood.csv
+#python parse_inventar_xml.py -i DI_export_eth.xml -e FLOOD  -o flood_level0.csv -a level0
+#python parse_inventar_xml.py -i DI_export_eth.xml -e FLOOD  -o flood_from_1990.csv -y 1990
+#python parse_inventar_xml.py -i DI_export_eth.xml -e FLOOD  -o flood_level0_from_1990.csv -a level0 -y 1990
+ 
