@@ -1,0 +1,52 @@
+district,District,text,
+date,Date,date,
+Time,Time,time,
+bed_capacity_holding_centres,Holding Centres: Bed Capacity,integer,
+bed_functional_holding_centres,Holding Centres: Bed Functional,integer,
+bed_in_use_holding_centres,Holding Centres: Bed In Use,integer,
+bed_capacity_treatment_units,Treatment Units: Bed Capacity,integer,
+bed_functional_treatment_units,Treatment Units: Bed Functional,integer,
+bed_In_use_treatment_units,Treatment Units: Bed In Use,integer,
+bed_capacity_ccc,CCCs: Bed Capacity,integer,
+bed_functional_ccc,CCCs: Bed Functional,integer,
+ccc_bed_in_use,CCCs: Bed In Use,integer,
+surveillance_teams_number,Number Surveillance Teams,integer,
+alerts_number,Number of Alerts,integer,
+alerts_responded_number,Number of Alerts responded to,integer,
+quarantine_houses,Number of House under Quarantine,integer,
+quarantine_houses_total,Total number of houses currently under quarantine,integer,
+district_under_quarantine,Is the district under quarantine ?,text,
+quarantine_chiefdom,Quarantine Chiefdom,repeat,
+quarantine_chiefdom/quarantine_chiefdom_village_name,Chiefdoms or village Name under quarantine,text,repeat
+quarantine_chiefdom/quarantine_chiefdom_village_size,Chiefdoms or village Size,integer,repeat
+quarantine_chiefdom/quarantine_chiefdom_village_start_date,Chiefdoms or village quarantine Start Date,date,repeat
+quarantine_chiefdom/quarantine_chiefdom_village_end_date,Chiefdoms or village quarantine End Date,date,repeat
+burial_teams_number,Number of Burial teams,integer,
+burial_alerts,Number of burial alerts,integer,
+burials_number,Number of burials,integer,
+oicc,OICC,repeat,
+oicc/oicc_name,OICC Name,text,repeat
+oicc/oicc_capacity,OICC Capacity,integer,repeat
+oicc/oicc_utilised,OICC Utilised,integer,repeat
+surveillance_vehicles_total_number,Surveillance vehicles Total Number,integer,
+surveillance_vehicles_not_usable,Surveillance Vehicles Not Usable,integer,
+surveillance_motorbikes_total_number,Surveillance motorbikes Total Number,integer,
+surveillance_motorbikes_not_usable,Surveillance Motorbikes Not Usable,integer,
+burial_vehicles_total_number,Burial Vehicles Total Number,integer,
+burial_vehicles_not_usable,Burial Vehicles Not Usable,integer,
+ambulances_total_number,Ambulances Total Number,integer,
+ambulances_not_usable,Ambulances Not Usable,integer,
+fuel_required_weekly,Fuel Required per week (ltrs),integer,
+fuel_currently_held,Fuel currently held (ltrs),integer,
+days_lab_supplies,Number days lab supplies (approximate),integer,
+days_med_supplies,Number days med supplies (approximate),integer,
+days_non_med_supplies,days_non_med_supplies (approximate),integer,
+days_PPE,Number days PPE (approximate),integer,
+staff_qualify_for_hazard_pay_number,Number staff qualify for hazard pay,integer,
+staff_paid_at_last_pay_day_number,Number Staff paid at last pay day,integer,
+weeks_hazard_pay_outstanding_number,Number weeks hazard pay outstanding,integer,
+comments,Threat to Operations Comments,repeat,
+comments/issue_category,Category,select_one issues_category,repeat
+comments/issue_comment,Comments and Issues,text,repeat
+created,Created By,text,
+verified,Verified By,text,
